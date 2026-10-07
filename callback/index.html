@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; font-src 'none'; form-action 'none'; base-uri 'none'">
+  <title>OAuth callback</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      line-height: 1.5;
+      max-width: 40rem;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      color: #1a1a1a;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-all;
+      background: #f4f4f4;
+      padding: 0.75rem;
+      margin: 0 0 1rem;
+    }
+    button { font: inherit; }
+  </style>
+</head>
+<body>
+  <h1>OAuth callback</h1>
+  <p>This page shows the <code>code</code>, <code>state</code>, and <code>error</code> query parameters from this URL so they can be copied. It does not send them anywhere.</p>
+  <div id="params"></div>
+  <script>
+    (function () {
+      var names = ["code", "state", "error", "error_description"];
+      var params = new URLSearchParams(window.location.search);
+      var root = document.getElementById("params");
+      var shown = 0;
+
+      names.forEach(function (name) {
+        if (!params.has(name)) return;
+        shown += 1;
+        var value = params.get(name);
+
+        var heading = document.createElement("h2");
+        heading.textContent = name;
+
+        var block = document.createElement("pre");
+        block.textContent = value;
+
+        var button = document.createElement("button");
+        button.type = "button";
+        button.textContent = "Copy " + name;
+        button.addEventListener("click", function () {
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            button.textContent = "Select the text above to copy it";
+            return;
+          }
+          navigator.clipboard.writeText(value).then(function () {
+            button.textContent = "Copied " + name;
+          }, function () {
+            button.textContent = "Select the text above to copy it";
+          });
+        });
+
+        root.appendChild(heading);
+        root.appendChild(block);
+        root.appendChild(button);
+      });
+
+      if (shown === 0) {
+        var empty = document.createElement("p");
+        empty.textContent = "No code, state, or error parameter is present in this URL.";
+        root.appendChild(empty);
+      }
+    })();
+  </script>
+</body>
+</html>
